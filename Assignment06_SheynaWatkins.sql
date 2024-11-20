@@ -1,6 +1,6 @@
 --*************************************************************************--
 -- Title: Assignment06
--- Author: YourNameHere
+-- Author: Sheyna Watkins
 -- Desc: This file demonstrates how to use Views
 -- Change Log: When,Who,What
 -- 2024-11-19,SheynaWatkins,Created File
@@ -175,6 +175,37 @@ print
 --        2) Create one view per table!
 --		  3) Use SchemaBinding to protect the views from being orphaned!
 
+Go
+Create View dbo.vCategories
+  With SCHEMABINDING
+  As
+  Select CategoryID, CategoryName
+    from dbo.Categories;
+Go
+
+Go
+Create View dbo.vProducts
+  With SCHEMABINDING
+  As
+  Select ProductID, ProductName, CategoryID, UnitPrice
+    from dbo.Products;
+Go
+
+Go
+Create View dbo.vEmployees
+  With SCHEMABINDING
+  As
+  Select EmployeeID, EmployeeFirstName, EmployeeLastName, ManagerID
+    from dbo.Employees;
+Go
+
+Go
+Create View dbo.vInventories
+  With SCHEMABINDING
+  As
+  Select InventoryID, InventoryDate, EmployeeID, ProductID, Count
+    from dbo.Inventories;
+Go
 
 -- Question 2 (5% pts): How can you set permissions, so that the public group CANNOT select data 
 -- from each table, but can select data from each view?
@@ -232,13 +263,16 @@ Select * From [dbo].[vProducts]
 Select * From [dbo].[vInventories]
 Select * From [dbo].[vEmployees]
 
-Select * From [dbo].[vProductsByCategories]
-Select * From [dbo].[vInventoriesByProductsByDates]
-Select * From [dbo].[vInventoriesByEmployeesByDates]
-Select * From [dbo].[vInventoriesByProductsByCategories]
-Select * From [dbo].[vInventoriesByProductsByEmployees]
-Select * From [dbo].[vInventoriesForChaiAndChangByEmployees]
-Select * From [dbo].[vEmployeesByManager]
-Select * From [dbo].[vInventoriesByProductsByCategoriesByEmployees]
+-- Select * From [dbo].[vProductsByCategories]
+-- Select * From [dbo].[vInventoriesByProductsByDates]
+-- Select * From [dbo].[vInventoriesByEmployeesByDates]
+-- Select * From [dbo].[vInventoriesByProductsByCategories]
+-- Select * From [dbo].[vInventoriesByProductsByEmployees]
+-- Select * From [dbo].[vInventoriesForChaiAndChangByEmployees]
+-- Select * From [dbo].[vEmployeesByManager]
+-- Select * From [dbo].[vInventoriesByProductsByCategoriesByEmployees]
 
 /***************************************************************************************/
+
+-- to see all views, functions stored proceedures etc ....
+Select * from SysComments;
