@@ -210,16 +210,47 @@ Go
 -- Question 2 (5% pts): How can you set permissions, so that the public group CANNOT select data 
 -- from each table, but can select data from each view?
 
+Deny Select On dbo.Categories to Public;
+Deny Select On dbo.Products to Public;
+Deny Select On dbo.Employees to Public;
+Deny Select On dbo.Inventories to Public;
+
+Grant Select On dbo.vCategories to Public;
+Grant Select On dbo.vProducts to Public;
+Grant Select On dbo.vEmployees to Public;
+Grant Select On dbo.vInventories to Public;
+
 
 -- Question 3 (10% pts): How can you create a view to show a list of Category and Product names, 
 -- and the price of each product?
+Go
+Create View vProductsByCategories
+  As
+  Select c.CategoryName, p.ProductName, p.UnitPrice 
+	From dbo.Products as p
+	Join dbo.Categories as c
+	  On p.CategoryID = c.CategoryID;
+Go
+
 -- Order the result by the Category and Product!
+Select * From vProductsByCategories
+	Order by CategoryName, ProductName;
 
 
 -- Question 4 (10% pts): How can you create a view to show a list of Product names 
 -- and Inventory Counts on each Inventory Date?
--- Order the results by the Product, Date, and Count!
+Go 
+Create View vInventoriesByProductsByDates
+  As
+  Select p.ProductName, i.InventoryDate, i.Count
+    From dbo.Products as p
+	Join dbo.Inventories as i
+	  On p.ProductID = i.ProductID;
+Go 
 
+-- Order the results by the Product, Date, and Count!
+Select * from vInventoriesByProductsByDates
+  Order by ProductName, InventoryDate, Count;
 
 -- Question 5 (10% pts): How can you create a view to show a list of Inventory Dates 
 -- and the Employee that took the count?
@@ -263,7 +294,7 @@ Select * From [dbo].[vProducts]
 Select * From [dbo].[vInventories]
 Select * From [dbo].[vEmployees]
 
--- Select * From [dbo].[vProductsByCategories]
+Select * From [dbo].[vProductsByCategories]
 -- Select * From [dbo].[vInventoriesByProductsByDates]
 -- Select * From [dbo].[vInventoriesByEmployeesByDates]
 -- Select * From [dbo].[vInventoriesByProductsByCategories]
