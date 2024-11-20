@@ -177,32 +177,32 @@ print
 
 Go
 Create View dbo.vCategories
-  With SCHEMABINDING
-  As
+  with SCHEMABINDING
+  as
   Select CategoryID, CategoryName
     from dbo.Categories;
 Go
 
 Go
 Create View dbo.vProducts
-  With SCHEMABINDING
-  As
+  with SCHEMABINDING
+  as
   Select ProductID, ProductName, CategoryID, UnitPrice
     from dbo.Products;
 Go
 
 Go
 Create View dbo.vEmployees
-  With SCHEMABINDING
-  As
+  with SCHEMABINDING
+  as
   Select EmployeeID, EmployeeFirstName, EmployeeLastName, ManagerID
     from dbo.Employees;
 Go
 
 Go
 Create View dbo.vInventories
-  With SCHEMABINDING
-  As
+  with SCHEMABINDING
+  as
   Select InventoryID, InventoryDate, EmployeeID, ProductID, Count
     from dbo.Inventories;
 Go
@@ -210,51 +210,63 @@ Go
 -- Question 2 (5% pts): How can you set permissions, so that the public group CANNOT select data 
 -- from each table, but can select data from each view?
 
-Deny Select On dbo.Categories to Public;
-Deny Select On dbo.Products to Public;
-Deny Select On dbo.Employees to Public;
-Deny Select On dbo.Inventories to Public;
+Deny Select on dbo.Categories to Public;
+Deny Select on dbo.Products to Public;
+Deny Select on dbo.Employees to Public;
+Deny Select on dbo.Inventories to Public;
 
-Grant Select On dbo.vCategories to Public;
-Grant Select On dbo.vProducts to Public;
-Grant Select On dbo.vEmployees to Public;
-Grant Select On dbo.vInventories to Public;
+Grant Select on dbo.vCategories to Public;
+Grant Select on dbo.vProducts to Public;
+Grant Select on dbo.vEmployees to Public;
+Grant Select on dbo.vInventories to Public;
 
 
 -- Question 3 (10% pts): How can you create a view to show a list of Category and Product names, 
 -- and the price of each product?
 Go
 Create View vProductsByCategories
-  As
+  as
   Select c.CategoryName, p.ProductName, p.UnitPrice 
-	From dbo.Products as p
-	Join dbo.Categories as c
-	  On p.CategoryID = c.CategoryID;
+	from dbo.Products as p
+	join dbo.Categories as c
+	  on p.CategoryID = c.CategoryID;
 Go
 
 -- Order the result by the Category and Product!
-Select * From vProductsByCategories
-	Order by CategoryName, ProductName;
+Select * from vProductsByCategories
+  order by CategoryName, ProductName;
 
 
 -- Question 4 (10% pts): How can you create a view to show a list of Product names 
 -- and Inventory Counts on each Inventory Date?
 Go 
 Create View vInventoriesByProductsByDates
-  As
+  as
   Select p.ProductName, i.InventoryDate, i.Count
-    From dbo.Products as p
-	Join dbo.Inventories as i
-	  On p.ProductID = i.ProductID;
+    from dbo.Products as p
+	join dbo.Inventories as i
+	  on p.ProductID = i.ProductID;
 Go 
 
 -- Order the results by the Product, Date, and Count!
 Select * from vInventoriesByProductsByDates
-  Order by ProductName, InventoryDate, Count;
+  order by ProductName, InventoryDate, Count;
 
 -- Question 5 (10% pts): How can you create a view to show a list of Inventory Dates 
 -- and the Employee that took the count?
+Go
+Create View vInventoriesByEmployeesByDates
+  as 
+  Select DISTINCT i.InventoryDate, EmployeeName = e.EmployeeFirstName + ' ' + e.EmployeeLastName
+	from dbo.Inventories as i
+	join dbo.Employees as e 
+	  on i.EmployeeID = e.EmployeeID
+Go 
+
 -- Order the results by the Date and return only one row per date!
+Select * from vInventoriesByEmployeesByDates
+  order by InventoryDate asc;
+Go
 
 -- Here is are the rows selected from the view:
 
@@ -267,10 +279,41 @@ Select * from vInventoriesByProductsByDates
 -- and the Inventory Date and Count of each product?
 -- Order the results by the Category, Product, Date, and Count!
 
+Go
+Create View vInventoriesByProductsByCategories
+as
+  Select c.CategoryName, p.ProductName, p.UnitPrice, i.InventoryDate, i.Count
+	from dbo.Products as p
+	join dbo.Categories as c
+	  on p.CategoryID = c.CategoryID
+	join dbo.Inventories as i
+	  on p.ProductID = i.ProductID;
+Go 
+
+Select * from vInventoriesByProductsByCategories
+	order by CategoryName asc, ProductName asc, InventoryDate asc, Count asc;
+Go
 
 -- Question 7 (10% pts): How can you create a view to show a list of Categories, Products, 
 -- the Inventory Date and Count of each product, and the EMPLOYEE who took the count?
+Go 
+Create View vInventoriesByProductsByEmployees
+  as 
+  Select c.CategoryName, p.ProductName, i.InventoryDate, i.Count,  EmployeeName = e.EmployeeFirstName + ' ' + e.EmployeeLastName
+    from dbo.Products as p
+	join dbo.Categories as c
+	  on p.CategoryID = c.CategoryID
+	join dbo.Inventories as i
+	  on p.ProductID = i.ProductID
+	join dbo.Employees as e 
+	  on i.EmployeeID = e.EmployeeID;
+Go
+
 -- Order the results by the Inventory Date, Category, Product and Employee!
+Select * from vInventoriesByProductsByEmployees
+  order by InventoryDate asc, CategoryName asc, ProductName asc, EmployeeName asc;
+Go 
+
 
 
 -- Question 8 (10% pts): How can you create a view to show a list of Categories, Products, 
@@ -295,10 +338,10 @@ Select * From [dbo].[vInventories]
 Select * From [dbo].[vEmployees]
 
 Select * From [dbo].[vProductsByCategories]
--- Select * From [dbo].[vInventoriesByProductsByDates]
--- Select * From [dbo].[vInventoriesByEmployeesByDates]
--- Select * From [dbo].[vInventoriesByProductsByCategories]
--- Select * From [dbo].[vInventoriesByProductsByEmployees]
+Select * From [dbo].[vInventoriesByProductsByDates]
+Select * From [dbo].[vInventoriesByEmployeesByDates]
+Select * From [dbo].[vInventoriesByProductsByCategories]
+Select * From [dbo].[vInventoriesByProductsByEmployees]
 -- Select * From [dbo].[vInventoriesForChaiAndChangByEmployees]
 -- Select * From [dbo].[vEmployeesByManager]
 -- Select * From [dbo].[vInventoriesByProductsByCategoriesByEmployees]
