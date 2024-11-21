@@ -220,7 +220,6 @@ Grant Select on dbo.vProducts to Public;
 Grant Select on dbo.vEmployees to Public;
 Grant Select on dbo.vInventories to Public;
 
-
 -- Question 3 (10% pts): How can you create a view to show a list of Category and Product names, 
 -- and the price of each product?
 Go
@@ -235,7 +234,22 @@ Go
 -- Order the result by the Category and Product!
 Select * from vProductsByCategories
   order by CategoryName, ProductName;
+Go 
 
+-- alternate version of Question 3 view using order by inside the view
+-- this is the only question I provided this alternative view for:
+Go
+Create View vProductsByCategoriesWithOrderBy
+  as
+  Select Top 100000 c.CategoryName, p.ProductName, p.UnitPrice 
+	from dbo.Products as p
+	join dbo.Categories as c
+	  on p.CategoryID = c.CategoryID
+	order by c.CategoryName, p.ProductName;
+Go
+
+Select * from vProductsByCategoriesWithOrderBy;
+Go 
 
 -- Question 4 (10% pts): How can you create a view to show a list of Product names 
 -- and Inventory Counts on each Inventory Date?
@@ -251,6 +265,7 @@ Go
 -- Order the results by the Product, Date, and Count!
 Select * from vInventoriesByProductsByDates
   order by ProductName, InventoryDate, Count;
+Go 
 
 -- Question 5 (10% pts): How can you create a view to show a list of Inventory Dates 
 -- and the Employee that took the count?
@@ -314,21 +329,66 @@ Select * from vInventoriesByProductsByEmployees
   order by InventoryDate asc, CategoryName asc, ProductName asc, EmployeeName asc;
 Go 
 
-
-
 -- Question 8 (10% pts): How can you create a view to show a list of Categories, Products, 
 -- the Inventory Date and Count of each product, and the Employee who took the count
 -- for the Products 'Chai' and 'Chang'? 
+Go 
+Create View vInventoriesForChaiAndChangByEmployees
+  as
+  Select c.CategoryName, p.ProductName, i.InventoryDate, i.Count,  EmployeeName = e.EmployeeFirstName + ' ' + e.EmployeeLastName
+    from dbo.Categories as c 
+	join dbo.Products as p
+	  on c.CategoryID = p.CategoryID
+	join dbo.Inventories as i
+	  on p.ProductID = i.ProductID
+	join dbo.Employees as e 
+	  on i.EmployeeID = e.EmployeeID
+	where p.ProductName = 'Chai' or p.ProductName = 'Chang';
+Go 
 
+Select * from vInventoriesForChaiAndChangByEmployees;
+Go 
 
 -- Question 9 (10% pts): How can you create a view to show a list of Employees and the Manager who manages them?
--- Order the results by the Manager's name!
+Go
+Create View vEmployeesByManager
+ as
+  Select Manager = man.EmployeeFirstName + ' ' + man.EmployeeLastName, Employee = emp.EmployeeFirstName + ' ' + emp.EmployeeLastName
+    from dbo.Employees as man 
+	join dbo.Employees as emp
+	  on man.EmployeeID = emp.ManagerID;
+Go
 
+-- Order the results by the Manager's name!
+Select * from vEmployeesByManager
+  order by Manager, Employee; -- need to order by employee too to match the image
+Go 
 
 -- Question 10 (20% pts): How can you create one view to show all the data from all four 
 -- BASIC Views? Also show the Employee's Manager Name and order the data by 
 -- Category, Product, InventoryID, and Employee.
+Go 
+Create View vInventoriesByProductsByCategoriesByEmployees
+  as 
+  Select c.CategoryID, c.CategoryName, p.ProductID, p.ProductName, p.UnitPrice, 
+      i.InventoryID, i.InventoryDate, i.Count, emp.EmployeeID, 
+	  Employee = emp.EmployeeFirstName + ' ' + emp.EmployeeLastName,
+	  Manager = man.EmployeeFirstName + ' ' + man.EmployeeLastName
+    from dbo.Categories as c 
+	join dbo.Products as p
+	  on c.CategoryID = p.CategoryID
+	join dbo.Inventories as i
+	  on p.ProductID = i.ProductID
+	join dbo.Employees as emp 
+	  on i.EmployeeID = emp.EmployeeID
+	join dbo.Employees as man 
+	  on emp.ManagerID = man.EmployeeID;
+Go 
 
+--  order the data by Category, Product, InventoryID, and Employee.
+Select * from vInventoriesByProductsByCategoriesByEmployees
+  order by CategoryName asc, ProductName asc, InventoryID asc, Employee asc;
+Go 
 
 -- Test your Views (NOTE: You must change the your view names to match what I have below!)
 Print 'Note: You will get an error until the views are created!'
@@ -342,11 +402,8 @@ Select * From [dbo].[vInventoriesByProductsByDates]
 Select * From [dbo].[vInventoriesByEmployeesByDates]
 Select * From [dbo].[vInventoriesByProductsByCategories]
 Select * From [dbo].[vInventoriesByProductsByEmployees]
--- Select * From [dbo].[vInventoriesForChaiAndChangByEmployees]
--- Select * From [dbo].[vEmployeesByManager]
--- Select * From [dbo].[vInventoriesByProductsByCategoriesByEmployees]
+Select * From [dbo].[vInventoriesForChaiAndChangByEmployees]
+Select * From [dbo].[vEmployeesByManager]
+Select * From [dbo].[vInventoriesByProductsByCategoriesByEmployees]
 
 /***************************************************************************************/
-
--- to see all views, functions stored proceedures etc ....
-Select * from SysComments;
